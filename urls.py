@@ -9,5 +9,5 @@ urlpatterns = [
     path('add/<int:pk>', views.addUser, name = 'addUser'),
     path('user/<int:pk>', views.user, name = 'user'),
     path('user/random/<int:pk>', views.randUser, name = 'randUser'),
-    path('<slug:slug>/analysis', views.analysis, name = 'analysis'),
+    path('<slug:slug>/analysis', views.analysis, name = 'analysis'), # not ready yet
 ]

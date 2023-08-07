@@ -30,6 +30,9 @@
 	{% if getRandomUser %}
 	<a href="{% url 'survey:randUser' user.pk %}" role="button">ᕕ( ᐛ )ᕗ 随机个用户看下</a>
 	{% endif %}
+	{% elif noValidUser %}
+	<h3>没有可用用户</h3>
+	<p>(ಥ﹏ಥ)</p>
 	{% else %}
 	<form action="{% url 'survey:addUser' user.pk %}" method="post">
 	{% csrf_token %}
@@ -40,7 +43,7 @@
 		<input type="text" name="message" id="userMsg">
 		<br>
 		<input type="submit" value="提交">
-	</form>
+	</form>	
 	{% endif %}
 </article>
 {% endblock %}

@@ -25,7 +25,7 @@ class AnswerInline(admin.StackedInline):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
 	list_display = ('name', 'message', 'pk', 'survey', 'date')
-	list_filter = ['name', 'date']
+	list_filter = ['survey', 'name', 'date']
 	fieldsets = [
 	(None, {'fields': ['name', 'message', 'survey']}),
 	]

@@ -5,11 +5,13 @@ import random
 
 # Create your views here.
 def index(request):
+	'show all surveys'
 	allCategories = Category.objects.all()
 	return render(request, 'index.html', {'categories': allCategories})
 	# not sure how to show all categories with their inner survey, try get all surveys first
 
 def survey(request, slug):
+	'display survey detail and handle post'
 	s = get_object_or_404(Survey, slug = slug)
 	questions = Question.objects.filter(survey = s)
 	if not questions:
@@ -36,6 +38,7 @@ def survey(request, slug):
 	return render(request, 'index.html', {'survey': s, 'questions': questions})
 
 def addUser(request, pk=1):
+	'attach answer form with user'
 	u = get_object_or_404(User, pk = pk)
 	if request.method == 'POST':
 		try:
@@ -50,17 +53,30 @@ def addUser(request, pk=1):
 		
 
 def user(request, pk):
+	'display user\' answers'
 	u = get_object_or_404(User, pk = pk)
 	answers = u.answer_set.all()
 	return render(request, 'user.html', {'user': u,'answers': answers, 'getRandomUser': True})
 	#save to pdf, txt, png in user html
 
 def randUser(request, pk):
+	'get a random user\' answers to display'
 	u = get_object_or_404(User, pk = pk)
 	us = User.objects.filter(survey = u.survey).exclude(pk = u.pk)
-	randu = random.choice(us)
-	answers = randu.answer_set.all()
-	return render(request, 'user.html', {'user':randu, 'answers': answers})
+	try:
+		randu = random.choice(us)
+		answers = randu.answer_set.all()
+		if randu and answers:
+			return render(request, 'user.html', {'user':randu, 'answers': answers})
+		else:
+			# return no valid user if other user' answers is empty 
+			return render(request, 'user.html', {'user': u, 'noValidUser': True})
+	except Exception as e:
+		# will raise IndexError if there are no other user
+		return render(request, 'user.html', {'user': u, 'noValidUser': True, 'errorMsg': e})
+	
+
+	
 
 
 
