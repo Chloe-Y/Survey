@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>A Generic Survey</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'style.css'%}">
+	<link rel="icon" href="{% static 'favicon.ico' %}">
+</head>
+<body>
+	{% block nav %}
+	<nav aria-label="breadcrumb">
+	  <ul>
+	    {% if categories %}
+	    <li>Home</li>
+	    {% elif survey %}
+	    <li><a href="{% url 'survey:index' %}">Home</a></li>
+	    <li>Survey</li>
+	    {% elif user %}
+	    <li><a href="{% url 'survey:index' %}">Home</a></li>
+	    <li><a href="{{ user.survey.get_absolute_url }}">Survey</a></li>
+	    <li>User</li>
+	    {% else %}
+	    <li><a href="{% url 'survey:index' %}">Home</a></li>
+	    <li><a href="{% url '' %">Survey</a></li>
+	    <li><a href="{% url '' %">User</a></li>
+	    <li>Analysis</li>	    
+	    {% endif %}
+	  </ul>
+	</nav>
+	{% endblock %}
+
+	{% block header %}
+	{% if errorMsg %}
+	<p style="text-align: center; color: red; max-width: 800px; border-radius: 0.25rem; text-align: center; margin: auto;">
+	{{ errorMsg }}
+	</p>
+	{% endif %}
+
+	{% if categories %}
+	<article style="text-align: center;">
+	<header>
+	<h2>全部问卷</h2>
+	<p>(づ￣ ³￣)づ</p>
+	</header>
+		{% for c in categories %}
+		<h3>{{ c.name }}:</h3>
+			{% for s in c.survey_set.all %}
+				<h5><a href="{{s.get_absolute_url}}" data-tooltip="{{s.slug}}">{{s.name}}</a></h5>
+			{% endfor %}
+		{% endfor %}
+	</article>
+	{% elif survey %}
+	<article>
+	<h1>{{survey.name}}</h1>
+	<p>ヽ(●ﾟ´Д｀ﾟ●)ﾉﾟ </p>
+	<p>{{survey.description|linebreaks}}</p>
+	</article>
+	{% endif %}
+	{% endblock %}
+
+	{% block content %}
+	{% if questions %}
+	<article>
+	<form action="{% url 'survey:survey' survey.slug %}" method="post">
+	{% csrf_token %} 
+	{% for q in questions %}
+		{% if q.types == 'M' %}
+		<fieldset>
+			<legend><a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}</legend>
+			{% for c in q.get_choices %}
+			<label for="question-{{q.order}}-checkbox{{forloop.counter}}">
+				<input type="checkbox" name="answer-{{q.order}}" id="question-{{q.order}}-checkbox{{forloop.counter}}" value="{{c}}">
+				{{c}}
+			</label>
+			{% endfor %}
+		</fieldset>
+		{% elif q.types == 'T' %}
+		<label for="question-{{q.order}}"><a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}</label>
+		<textarea id="question-{{q.order}}" name="answer-{{q.order}}" required></textarea>
+		{% elif q.types == "R" %}
+		<fieldset>
+			<legend><a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}</legend>
+			{% for c in q.get_choices %}
+			<label for="question-{{q.order}}-radio{{forloop.counter}}">
+			<input type="radio" id="question-{{q.order}}-radio{{forloop.counter}}" name="answer-{{q.order}}" value="{{c}}">
+			{{c}}
+			</label>
+			{% endfor %}		
+		</fieldset>
+		{% elif q.types == "N" %}
+		<label for="question-{{q.order}}">
+			<a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}
+			<input type="range" name="answer-{{q.order}}" id="question-{{q.order}}" min="0" max="10" step="1" list="tickmarks" required>
+			<datalist id="tickmarks">
+				<option value="0"></option>
+				<option value="1"></option>
+				<option value="2"></option>
+				<option value="3"></option>
+				<option value="4"></option>
+				<option value="5"></option>
+				<option value="6"></option>
+				<option value="7"></option>
+				<option value="8"></option>
+				<option value="9"></option>
+				<option value="10"></option>
+			</datalist>
+		</label>
+		{% elif q.types == "S" %}
+		<label for="question-{{q.order}}"><a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}</label>
+		<select id="question-{{q.order}}" name="answer-{{q.order}}" required>
+		{% for c in q.get_choices %}
+			<option>{{c}}</option>
+		{% endfor %}
+		</select>
+		{% else %}
+		<label for="question-{{q.order}}"><a href="#question-{{q.order}}">{{q.order}}.</a> {{q.text}}</label>
+		<input type="text" name="answer-{{q.order}}" id="question-{{q.order}}" required>
+		{% endif %}
+		<br>
+	{% endfor %}
+	<input type="submit" name="提交">
+	</form>
+	</article>
+	{% endif %}
+	{% endblock %}
+</body>
+</html>
+
+
+

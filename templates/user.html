@@ -1,0 +1,46 @@
+{% extends 'index.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+{% if errorMsg %}
+<p style="text-align: center; color: red; max-width: 800px; border-radius: 0.25rem; text-align: center; margin: auto;">{{ errorMsg }}</p>
+{% endif %}
+<article>
+	{% if user and answers %}
+	<header>
+	<h1>用户：{{user.name}}</h1>
+	{% if user.message %}
+	<h5>留言：{{user.message}}</h5>
+	{% else %}
+	<h5>留言：无 </h5>
+	{% endif %}
+	<p>时间：{{user.date}}</p>
+	<p>问卷：<a href="{{ user.survey.get_absolute_url }}">{{user.survey.name}}</a></p>
+	<p>┬┴┬┴┤･ω･)ﾉ</p>
+	</header>
+	{% for a in answers %}
+		<div class="heading">
+			<p class="question">{{ forloop.counter}}. {{ a.question.text }}</p>
+			<h5 class="answer">{{a.text|linebreaks}}</h5>
+		</div>
+		<hr>
+	{% endfor %}
+	{% if getRandomUser %}
+	<a href="{% url 'survey:randUser' user.pk %}" role="button">ᕕ( ᐛ )ᕗ 随机个用户看下</a>
+	{% endif %}
+	{% else %}
+	<form action="{% url 'survey:addUser' user.pk %}" method="post">
+	{% csrf_token %}
+		<label for="userName">用户名：</label>
+		<input type="text" name="name" id="userName" required>
+		<br>
+		<label for="userMsg">说点什么？</label>
+		<input type="text" name="message" id="userMsg">
+		<br>
+		<input type="submit" value="提交">
+	</form>
+	{% endif %}
+</article>
+{% endblock %}
